@@ -16,3 +16,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - run: docker build -t devops-kubernetes-demo:1.0.0 .
+      - uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: devops-kubernetes-demo:1.0.0
+          format: table
+          exit-code: "1"
+          severity: HIGH,CRITICAL
