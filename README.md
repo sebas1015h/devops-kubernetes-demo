@@ -64,13 +64,7 @@ Docker Desktop
 npm install
 ```
 
-La aplicación funciona sin archivo `.env`. Si quieres personalizarla, copia el ejemplo y ajusta los valores:
-
-```bash
-cp .env.example .env
-```
-
-Node no carga `.env` de forma automática. Exporta las variables en la terminal o en el entorno del contenedor.
+La aplicación funciona sin archivo `.env`. Las variables (`APP_NAME`, `APP_VERSION`, `APP_ENVIRONMENT`, `PORT`) se toman del entorno del proceso, del contenedor o del Deployment de Kubernetes. Si no se definen, usa valores por defecto.
 
 ## Ejecutar
 
