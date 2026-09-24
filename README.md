@@ -2,7 +2,7 @@
 
 Aplicación web local para una demostración técnica del recorrido:
 
-`Código → Git → GitHub → GitHub Actions → CodeQL → Docker → Trivy → Kubernetes → Rolling Update → Logs → Métricas → HPA`
+`Código → Git → GitHub → GitHub Actions → CodeQL → Docker → Trivy → Kubernetes → Rolling Update → Logs`
 
 Esta aplicación Node.js es estable, sin estado y puede ejecutarse en Docker o en Kubernetes.
 
@@ -319,5 +319,5 @@ Cada request escribe una línea:
 - `/health` está listo para `livenessProbe` y `readinessProbe`.
 - La aplicación no guarda estado ni archivos locales.
 - El hostname identifica el proceso o Pod que responde.
-- `/cpu` permite provocar carga para un HPA.
+- `/cpu` permite generar carga de CPU de forma controlada.
 - El cierre controlado responde a `SIGTERM`.
