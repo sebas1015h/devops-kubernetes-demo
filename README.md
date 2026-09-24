@@ -99,7 +99,7 @@ Detén el contenedor con Ctrl+C. Docker envía `SIGTERM` y la aplicación se cie
 
 Docker Desktop trae un clúster local. Actívalo en **Settings → Kubernetes → Enable Kubernetes** y espera a que quede en ejecución.
 
-La imagen tiene que existir en ese mismo Docker. El Deployment usa `imagePullPolicy: IfNotPresent`: si el nodo ya la tiene, no la vuelve a descargar. Docker Desktop en modo kind la toma del almacén local de imágenes.
+El Deployment usa la imagen publicada en GitHub: `ghcr.io/sebas1015h/devops-kubernetes-demo:1.0.0`. `imagePullPolicy` es `IfNotPresent`. El runner descarga esa imagen desde GHCR y la importa al clúster. Si el nodo ya la tiene, no la vuelve a descargar.
 
 Detén el contenedor suelto si todavía usa el puerto 3000 y despliega:
 

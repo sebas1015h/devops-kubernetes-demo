@@ -53,8 +53,6 @@ jobs:
         run: |
           docker pull "ghcr.io/${{ github.repository }}:1.0.0"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          docker tag "ghcr.io/${{ github.repository }}:1.0.0" devops-kubernetes-demo:1.0.0
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - shell: powershell
         run: .\scripts\import-image.ps1
       - shell: powershell

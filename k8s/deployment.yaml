@@ -22,7 +22,7 @@ spec:
       terminationGracePeriodSeconds: 20
       containers:
         - name: devops-demo
-          image: devops-kubernetes-demo:1.0.0
+          image: ghcr.io/sebas1015h/devops-kubernetes-demo:1.0.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
