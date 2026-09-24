@@ -6,6 +6,31 @@ Aplicación web local para una demostración técnica del recorrido:
 
 Esta aplicación Node.js es estable, sin estado y puede ejecutarse en Docker o en Kubernetes.
 
+## Qué incluye
+
+| Área | Contenido |
+| --- | --- |
+| Aplicación | Node.js + Express en `src/` |
+| Pruebas | `test/` con `node:test` + `supertest` |
+| Contenedor | Dockerfile multi-stage, usuario no-root, `HEALTHCHECK` |
+| CI | `.github/workflows/ci.yml` — build, lint y test en PR |
+| Imagen | `.github/workflows/docker-publish.yml` — build, Trivy y push a GHCR |
+| Seguridad | `.github/workflows/codeql.yml` — CodeQL (GitHub Advanced Security) |
+| Deploy | `.github/workflows/deploy.yml` — entorno `production` con aprobación |
+| Dependabot | `.github/dependabot.yml` — npm, Actions y Docker |
+| Kubernetes | Deployment, Service, HPA e Ingress |
+
+## La API
+
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| `GET` | `/` | Info del servicio (`Accept: application/json`) o dashboard HTML |
+| `GET` | `/health` | Health check |
+| `GET` | `/api/products` | Catálogo de productos |
+| `GET` | `/api/products/:id` | Detalle de producto |
+
+También expone `/version`, `/info` y `/cpu` para la demo de ciclo de vida.
+
 ## Arquitectura
 
 ```text
@@ -19,6 +44,8 @@ Express Application
    +-- /version
    +-- /info
    +-- /cpu
+   +-- /api/products
+   +-- /api/products/:id
 ```
 
 La interfaz consume `/health` y `/info` cada 3 segundos, sin recargar la página. La versión visible sale únicamente de `APP_VERSION`.
@@ -63,13 +90,14 @@ npm run dev
 
 Reinicia el proceso cuando cambian los archivos de `src/`.
 
-## Ejecutar pruebas
+## Lint y pruebas
 
 ```bash
+npm run lint
 npm test
 ```
 
-Las pruebas usan el test runner incluido en Node.js. Terminan con código `0` cuando todo es correcto.
+Las pruebas usan `node:test` con `supertest`. Terminan con código `0` cuando todo es correcto.
 
 ## Ejecutar con Docker
 
@@ -107,6 +135,7 @@ Detén el contenedor suelto si todavía usa el puerto 3000 y despliega:
 kubectl apply -f k8s/
 kubectl get pods
 kubectl get service devops-demo
+kubectl get ingress devops-demo
 ```
 
 Abre [http://localhost:3000](http://localhost:3000). El ambiente pasa a `kubernetes` y el hostname es el nombre del Pod. Hay dos réplicas, así que al refrescar puede responder uno u otro.
@@ -123,7 +152,18 @@ La versión sigue saliendo de `APP_VERSION`, dentro de `k8s/deployment.yaml`.
 
 ### `GET /`
 
-Dashboard con el nombre, la versión, el ambiente, el estado, el hostname, el uptime, la versión de Node.js y la fecha/hora.
+Con `Accept: application/json` responde info del servicio:
+
+```json
+{
+  "service": "DevOps Kubernetes Demo",
+  "version": "1.0.0",
+  "environment": "local",
+  "endpoints": ["/health", "/version", "/info", "/cpu", "/api/products", "/api/products/:id"]
+}
+```
+
+Sin ese header (navegador), sirve el dashboard HTML.
 
 ### `GET /health`
 
@@ -139,6 +179,24 @@ Comprobación ligera para probes y pipelines.
 ```
 
 Responde `200`.
+
+### `GET /api/products`
+
+```json
+{
+  "products": [
+    {
+      "id": "creditos",
+      "name": "Créditos",
+      "description": "Financiamiento cercano para impulsar el crecimiento de personas y negocios."
+    }
+  ]
+}
+```
+
+### `GET /api/products/:id`
+
+Detalle de un producto. Si no existe, responde `404`.
 
 ### `GET /version`
 
@@ -227,6 +285,14 @@ $env:APP_VERSION="2.0.0"; npm start
 
 ```bash
 curl http://localhost:3000/health
+```
+
+```bash
+curl -H "Accept: application/json" http://localhost:3000/
+```
+
+```bash
+curl http://localhost:3000/api/products
 ```
 
 ```bash

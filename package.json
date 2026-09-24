@@ -7,12 +7,18 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "node --watch src/app.js",
-    "test": "node --test"
+    "lint": "eslint .",
+    "test": "node --test test/app.test.js"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
     "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "eslint": "^9.22.0",
+    "globals": "^16.0.0",
+    "supertest": "^7.0.0"
   }
 }

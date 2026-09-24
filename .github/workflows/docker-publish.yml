@@ -1,0 +1,31 @@
+name: Docker Publish
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    name: Build Push GHCR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t devops-kubernetes-demo:1.0.0 .
+      - uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: devops-kubernetes-demo:1.0.0
+          format: table
+          exit-code: "1"
+          severity: HIGH,CRITICAL
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          docker tag devops-kubernetes-demo:1.0.0 "ghcr.io/${GITHUB_REPOSITORY}:1.0.0"
+          docker push "ghcr.io/${GITHUB_REPOSITORY}:1.0.0"

@@ -4,6 +4,7 @@ const healthRouter = require('./routes/health');
 const versionRouter = require('./routes/version');
 const infoRouter = require('./routes/info');
 const cpuRouter = require('./routes/cpu');
+const productsRouter = require('./routes/products');
 const { getConfig, getHostname } = require('./utils/systemInfo');
 
 const SHUTDOWN_TIMEOUT_MS = 10000;
@@ -50,10 +51,27 @@ function createApp() {
   app.disable('x-powered-by');
   app.use(requestLogger);
 
+  app.get('/', noStore, (req, res, next) => {
+    const wantsJson = req.accepts(['html', 'json']) === 'json';
+    if (!wantsJson) {
+      next();
+      return;
+    }
+
+    const config = getConfig();
+    res.status(200).json({
+      service: config.application,
+      version: config.version,
+      environment: config.environment,
+      endpoints: ['/health', '/version', '/info', '/cpu', '/api/products', '/api/products/:id'],
+    });
+  });
+
   app.use('/health', noStore, healthRouter);
   app.use('/version', noStore, versionRouter);
   app.use('/info', noStore, infoRouter);
   app.use('/cpu', noStore, cpuRouter);
+  app.use('/api/products', noStore, productsRouter);
 
   app.use(express.static(path.join(__dirname, '..', 'public')));
   app.use(notFoundHandler);

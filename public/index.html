@@ -1,69 +1,464 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DevOps Kubernetes Demo</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230f2744'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-size='28' fill='white' font-family='sans-serif'%3ED%3C/text%3E%3C/svg%3E" />
-    <link rel="stylesheet" href="/styles.css" />
+    <title>Compartamos Banco</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23e2186f'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-size='28' fill='white' font-family='sans-serif'%3EC%3C/text%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css?v=52" />
   </head>
   <body>
-    <div class="page">
-      <header class="header">
-        <div class="header-copy">
-          <p class="eyebrow">Application Status</p>
-          <h1>DevOps Kubernetes Demo</h1>
-          <p class="subtitle">Local CI/CD &amp; Kubernetes Demonstration</p>
+    <div class="site-nav">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Compartamos Banco">
+        <svg class="logo" viewBox="0 0 168 46" role="img" aria-hidden="true">
+          <text x="0" y="20" class="logo-name">Compartamos</text>
+          <text x="118" y="40" class="logo-bank">Banco</text>
+          <g class="fish fish-a" transform="translate(112 1)">
+            <ellipse cx="10" cy="6" rx="9" ry="4" />
+            <polygon points="18,6 24,2 24,10" />
+          </g>
+          <g class="fish fish-b" transform="translate(62 26)">
+            <ellipse cx="8" cy="5" rx="7.5" ry="3.4" />
+            <polygon points="15,5 20,2 20,8" />
+          </g>
+          <g class="fish fish-c" transform="translate(86 28)">
+            <ellipse cx="7" cy="4.5" rx="6.5" ry="3" />
+            <polygon points="13,4.5 18,2 18,7" />
+          </g>
+        </svg>
+      </a>
+      <nav class="menu" aria-label="Productos">
+        <button type="button" class="menu-link" id="open-creditos" aria-expanded="false" aria-controls="creditos-menu">Créditos</button>
+        <button type="button" class="menu-link" id="open-cuentas" aria-expanded="false" aria-controls="cuentas-menu">Cuentas</button>
+        <button type="button" class="menu-link" id="open-seguros" aria-expanded="false" aria-controls="seguros-menu">Seguros</button>
+        <button type="button" class="menu-link" id="open-canales" aria-expanded="false" aria-controls="canales-menu">Canales Digitales</button>
+      </nav>
+      <div class="actions">
+        <a class="btn btn-outline" href="#acceso">Acceso cuenta</a>
+        <a class="btn btn-solid" href="#experiencia">Explorar la demo</a>
+      </div>
+    </header>
+    <div class="credit-menu" id="creditos-menu" hidden>
+      <div class="credit-menu-card">
+        <div class="credit-side">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <path fill="#e39a4a" d="M8 44c3 8 12 12 20 9 1-6-2-11-7-13-6 1-10 0-13 4z" />
+            <path fill="#f6c7a2" d="M12 40c5 6 16 9 26 3 1-2 1-5 0-6-8 3-16 2-22-1-3 1-5 3-4 4z" />
+            <path fill="#e2186f" d="M22 12c8 0 14 6 14 14v6c0 6-6 11-14 11s-14-5-14-11v-6c0-8 6-14 14-14z" />
+            <circle cx="38" cy="16" r="6" fill="#f5c400" />
+          </svg>
+          <strong>Créditos</strong>
         </div>
-        <div class="header-meta">
-          <p class="version-badge" id="version-badge">v—</p>
-          <p class="status-pill" id="status-pill">
-            <span class="dot" id="status-dot" aria-hidden="true"></span>
-            <span id="status-label">Checking</span>
-          </p>
+        <div class="credit-col">
+          <p>Para grupos</p>
+          <a href="#creditos">Crédito Grupal</a>
         </div>
-      </header>
-
-      <main class="grid" aria-live="polite">
-        <article class="card">
-          <h2>Application</h2>
-          <p class="value" id="application">—</p>
-        </article>
-        <article class="card card-accent">
-          <h2>Version</h2>
-          <p class="value" id="version">—</p>
-        </article>
-        <article class="card">
-          <h2>Environment</h2>
-          <p class="value" id="environment">—</p>
-        </article>
-        <article class="card">
-          <h2>Status</h2>
-          <p class="value" id="status">—</p>
-        </article>
-        <article class="card">
-          <h2>Pod / Hostname</h2>
-          <p class="value" id="hostname">—</p>
-        </article>
-        <article class="card">
-          <h2>Uptime</h2>
-          <p class="value" id="uptime">—</p>
-        </article>
-        <article class="card">
-          <h2>Node.js</h2>
-          <p class="value" id="node-version">—</p>
-        </article>
-        <article class="card">
-          <h2>Timestamp</h2>
-          <p class="value" id="timestamp">—</p>
-        </article>
-      </main>
-
-      <footer class="footer">
-        <p>DevOps Demo Ready</p>
-        <p class="footer-note" id="refresh-note">Refreshing from /health and /info</p>
-      </footer>
+        <div class="credit-col">
+          <p>Para ti</p>
+          <a href="#creditos">Crédito Individual</a>
+        </div>
+        <div class="credit-col">
+          <p>Para clientes</p>
+          <a href="#creditos">Crédito Adicional Plus</a>
+          <a href="#creditos">Crédito Crece y Mejora</a>
+        </div>
+      </div>
     </div>
+    <div class="credit-menu" id="cuentas-menu" hidden>
+      <div class="credit-menu-card menu-card-two">
+        <div class="credit-side">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <g transform="rotate(-14 28 34)">
+              <rect x="6" y="18" width="36" height="24" rx="4" fill="#d10f66" />
+              <rect x="6" y="24" width="36" height="6" fill="#7a123f" />
+            </g>
+            <g transform="rotate(8 36 36)">
+              <rect x="18" y="20" width="36" height="24" rx="4" fill="#e2186f" />
+              <rect x="22" y="34" width="8" height="6" rx="1" fill="#f5c400" />
+            </g>
+          </svg>
+          <strong>Cuentas</strong>
+        </div>
+        <div class="credit-col">
+          <p>Cuentas</p>
+          <a href="#cuentas">Mis Ahorros Compartamos</a>
+          <a href="#cuentas">Cuenta A Mi Favor</a>
+          <a href="#cuentas">Mi Grupo Compartamos</a>
+          <a href="#cuentas">Cuenta Básica</a>
+          <a href="#cuentas">Cuenta Básica de Nómina</a>
+        </div>
+        <div class="credit-col">
+          <p>Crece tu dinero</p>
+          <a href="#cuentas">Inversiones Compartamos</a>
+        </div>
+      </div>
+    </div>
+    <div class="credit-menu" id="seguros-menu" hidden>
+      <div class="credit-menu-card menu-card-two">
+        <div class="credit-side">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <circle cx="32" cy="26" r="16" fill="#f8d5e6" />
+            <path fill="#e2186f" d="M10 30c5-14 14-18 22-18s17 4 22 18H10z" />
+            <path d="M32 30v14a8 8 0 0 1-11 7" fill="none" stroke="#f5c400" stroke-width="4" stroke-linecap="round" />
+          </svg>
+          <strong>Seguros</strong>
+        </div>
+        <div class="credit-col">
+          <p>Clientes con Crédito</p>
+          <a href="#seguros">Compartamos Protección</a>
+          <a href="#seguros">Seguro de Robo</a>
+        </div>
+        <div class="credit-col">
+          <p>Para Todos</p>
+          <a href="#seguros">Seguro Salud y Vida</a>
+        </div>
+      </div>
+    </div>
+    <div class="credit-menu" id="canales-menu" hidden>
+      <div class="credit-menu-card menu-card-label">
+        <div class="credit-side">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <rect x="18" y="8" width="28" height="48" rx="6" fill="#e2186f" />
+            <rect x="22" y="14" width="20" height="30" rx="2" fill="#fff" />
+            <circle cx="32" cy="50" r="2" fill="#fff" />
+            <circle cx="40" cy="20" r="7" fill="#f5c400" />
+            <text x="36" y="24" fill="#e2186f" font-size="10" font-family="Manrope, sans-serif" font-weight="700">@</text>
+          </svg>
+          <strong>Canales Digitales</strong>
+        </div>
+        <div class="credit-col">
+          <p>Aplicaciones</p>
+          <a href="#canales">Compartamos Móvil</a>
+        </div>
+        <div class="credit-col">
+          <p>En línea</p>
+          <a href="#canales">Compartamos NET</a>
+        </div>
+        <div class="credit-col">
+          <p>Plataformas</p>
+          <a href="#canales">Compartamos SMS</a>
+          <a href="#canales">CoDi</a>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <section class="hero-banner reveal" aria-label="Banca digital">
+      <div class="hero-slider">
+        <div class="hero-viewport">
+          <div class="hero-track" id="hero-track">
+            <div class="hero-frame">
+              <div class="hero-copy">
+                <p class="hero-kicker">Banca digital</p>
+                <h1 class="arrival-title">Cercanos a tu<br>crecimiento</h1>
+                <p class="hero-lead">Una experiencia clara, confiable y moderna para acompañar cada paso de tus metas.</p>
+                <div class="hero-ctas">
+                  <a class="btn btn-solid" href="#experiencia">Explorar la demo</a>
+                  <a class="btn btn-outline" href="#atencion">Conocer la experiencia</a>
+                </div>
+              </div>
+              <div class="hero-scene">
+                <svg class="bank-still" viewBox="0 0 520 340" aria-hidden="true">
+                  <ellipse cx="260" cy="308" rx="150" ry="14" fill="#f8d0e2"/>
+                  <polygon points="96,128 260,42 424,128" fill="#c41262"/>
+                  <polygon points="128,124 260,58 392,124" fill="#e2186f"/>
+                  <rect x="258" y="18" width="4" height="32" fill="#5c2d6e"/>
+                  <polygon points="262,20 300,30 262,40" fill="#f5c400"/>
+                  <rect x="118" y="124" width="284" height="10" fill="#f5c400"/>
+                  <rect x="118" y="134" width="284" height="148" fill="#e2186f"/>
+                  <rect x="146" y="150" width="16" height="116" fill="#fff"/>
+                  <rect x="198" y="150" width="16" height="116" fill="#fff"/>
+                  <rect x="306" y="150" width="16" height="116" fill="#fff"/>
+                  <rect x="358" y="150" width="16" height="116" fill="#fff"/>
+                  <rect x="170" y="162" width="20" height="26" fill="#fff7fb"/>
+                  <rect x="330" y="162" width="20" height="26" fill="#fff7fb"/>
+                  <rect x="170" y="206" width="20" height="26" fill="#fff7fb"/>
+                  <rect x="330" y="206" width="20" height="26" fill="#fff7fb"/>
+                  <path d="M232 190h56v92h-56z" fill="#f5c400"/>
+                  <path d="M232 190h56a28 28 0 0 0-56 0z" fill="#f0a000"/>
+                  <circle cx="276" cy="236" r="3" fill="#c41262"/>
+                </svg>
+              </div>
+            </div>
+            <div class="hero-frame hero-products">
+              <div class="hero-copy">
+                <p class="hero-kicker">Productos</p>
+                <p class="arrival-title">Créditos, cuentas,<br>inversiones y seguros</p>
+                <p class="hero-lead">Un solo relato visual para acompañar cada etapa del cliente.</p>
+              </div>
+              <div class="slide-offers">
+                <p id="creditos"><svg viewBox="0 0 80 80" aria-hidden="true"><ellipse cx="40" cy="50" rx="22" ry="20" fill="#c41262"/><path d="M31 34c1-10 17-10 18 0" fill="#e2186f"/><rect x="33" y="30" width="14" height="7" rx="3.5" fill="#9d124f"/><path d="M33 33H22M47 33h11" fill="none" stroke="#f5c400" stroke-width="3.2" stroke-linecap="round"/><circle cx="40" cy="52" r="8" fill="#f5c400"/></svg>Créditos</p>
+                <p id="cuentas"><svg viewBox="0 0 80 80" aria-hidden="true"><rect x="14" y="24" width="52" height="34" rx="7" fill="#e2186f" transform="rotate(-10 40 41)"/><rect x="14" y="32" width="52" height="8" fill="#9d124f" transform="rotate(-10 40 41)"/><rect x="22" y="44" width="12" height="8" rx="2" fill="#f5c400" transform="rotate(-10 40 41)"/></svg>Cuentas</p>
+                <p id="inversiones"><svg viewBox="0 0 80 80" aria-hidden="true"><rect x="10" y="26" width="60" height="30" rx="6" fill="#f5c400"/><circle cx="40" cy="41" r="8" fill="#e2186f"/><circle cx="22" cy="41" r="3.5" fill="#c41262"/><circle cx="58" cy="41" r="3.5" fill="#c41262"/></svg>Inversiones</p>
+                <p id="seguros"><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 14l22 9v16c0 14-9 24-22 30-13-6-22-16-22-30V23z" fill="#e2186f"/><path d="M40 26l12 5v8c0 8-5 13-12 16-7-3-12-8-12-16v-8z" fill="#f5c400"/></svg>Seguros</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="hero-arrow hero-prev" type="button" aria-label="Anterior">‹</button>
+        <button class="hero-arrow hero-next" type="button" aria-label="Siguiente">›</button>
+        <div class="hero-dots" role="tablist" aria-label="Diapositivas">
+          <button class="hero-dot" type="button" aria-label="Ciclo digital"></button>
+          <button class="hero-dot" type="button" aria-label="Productos"></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="value-section reveal" id="experiencia" aria-label="Banca digital">
+      <div class="bank-panel">
+        <div class="bank-panel-copy">
+          <p class="hero-kicker">Banca digital</p>
+          <h2>Crece con una experiencia cercana y confiable</h2>
+          <p>Diseñada para acompañarte con claridad, seguridad y una atención pensada en las personas.</p>
+          <a class="btn btn-solid" href="#atencion">Conocer más</a>
+        </div>
+        <div class="bank-panel-visual" aria-hidden="true">
+          <svg class="people-growth" viewBox="0 0 420 300">
+            <ellipse cx="210" cy="268" rx="150" ry="16" fill="#f8d0e2"/>
+            <rect x="248" y="88" width="110" height="148" rx="10" fill="#e2186f"/>
+            <rect x="264" y="108" width="22" height="28" fill="#fff7fb"/>
+            <rect x="320" y="108" width="22" height="28" fill="#fff7fb"/>
+            <rect x="264" y="156" width="22" height="28" fill="#fff7fb"/>
+            <rect x="320" y="156" width="22" height="28" fill="#fff7fb"/>
+            <path d="M248 88h110l-18-28H266z" fill="#c41262"/>
+            <rect x="288" y="188" width="30" height="48" fill="#f5c400"/>
+            <g>
+              <ellipse cx="118" cy="246" rx="22" ry="8" fill="#c41262"/>
+              <path d="M96 168c0 40 8 68 14 68s12-22 12-68" fill="#5c2d6e"/>
+              <path d="M122 168c0 40 8 68 14 68s10-22 10-68" fill="#5c2d6e"/>
+              <path d="M88 132c0-8 12-18 28-18h24c14 0 24 10 22 24v40c0 10-12 16-26 16h-20c-16 0-28-8-28-22z" fill="#e2186f"/>
+              <circle cx="128" cy="98" r="24" fill="#f6c7a2"/>
+              <path d="M106 90c2-24 42-26 46 0-12-12-36-12-46 0z" fill="#c41262"/>
+              <path d="M148 140c18-8 28-4 34 4" fill="none" stroke="#f6c7a2" stroke-width="12" stroke-linecap="round"/>
+            </g>
+            <g>
+              <ellipse cx="188" cy="248" rx="20" ry="7" fill="#f0a000"/>
+              <path d="M168 176c0 38 6 62 12 62s10-20 10-62" fill="#c41262"/>
+              <path d="M190 176c0 38 6 62 12 62s10-20 10-62" fill="#e2186f"/>
+              <path d="M160 140c0-6 10-16 26-16h22c12 0 22 8 20 22v36c0 10-12 16-24 16h-18c-14 0-26-8-26-22z" fill="#f5c400"/>
+              <circle cx="196" cy="108" r="22" fill="#f6c7a2"/>
+              <path d="M176 100c2-22 40-24 44 0-12-10-34-10-44 0z" fill="#5c2d6e"/>
+              <path d="M158 148c-14-18-18-34-8-48" fill="none" stroke="#f6c7a2" stroke-width="11" stroke-linecap="round"/>
+            </g>
+            <circle cx="74" cy="72" r="10" fill="#f5c400" opacity="0.85"/>
+            <circle cx="52" cy="118" r="6" fill="#e2186f" opacity="0.55"/>
+            <circle cx="360" cy="64" r="8" fill="#fff" opacity="0.7"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="value-grid value-grid-three">
+        <article>
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M24 8l14 6v10c0 10-6 16-14 20-8-4-14-10-14-20V14z" fill="#e2186f"/>
+            <path d="M24 16l8 3v6c0 5-3 8-8 10-5-2-8-5-8-10v-6z" fill="#f5c400"/>
+          </svg>
+          <h3>Confianza</h3>
+          <p>Seguridad y claridad en cada decisión de tu día a día.</p>
+        </article>
+        <article>
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <circle cx="18" cy="20" r="8" fill="#e2186f"/>
+            <circle cx="30" cy="20" r="8" fill="#f5c400"/>
+            <path d="M10 36c4-8 10-10 14-10s10 2 14 10" fill="none" stroke="#5c2d6e" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <h3>Cercanía</h3>
+          <p>Una atención humana, cercana y fácil de entender.</p>
+        </article>
+        <article>
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="10" y="12" width="28" height="24" rx="6" fill="#e2186f"/>
+            <path d="M18 24h12M24 18v12" stroke="#f5c400" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <h3>Agilidad digital</h3>
+          <p>Trámites y consultas con una experiencia más fluida.</p>
+        </article>
+      </div>
+
+      <div class="benefit-strip">
+        <p><strong>Experiencia simple</strong><span>Sin complicaciones</span></p>
+        <p><strong>Procesos ágiles</strong><span>Más rapidez</span></p>
+        <p><strong>Seguridad integrada</strong><span>Protección constante</span></p>
+        <p><strong>Disponibilidad digital</strong><span>Cuando la necesitas</span></p>
+      </div>
+    </section>
+
+    <section class="products-banner reveal" id="atencion" aria-label="Atención al cliente">
+      <div class="products-frame">
+        <div class="care">
+          <h2>Atención al cliente</h2>
+          <div class="care-actions">
+            <button class="care-btn care-call" type="button">
+              <svg class="care-phone" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 3h3l1.5 4-2 1.2a12 12 0 0 0 6.3 6.3L17 12.5 21 14v3a2 2 0 0 1-2.2 2A16 16 0 0 1 3 5.2 2 2 0 0 1 5 3h2z" fill="currentColor"/>
+              </svg>
+              Comunícate
+            </button>
+            <button class="care-btn care-place" type="button">
+              <svg class="care-pin" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7z" fill="currentColor"/>
+                <circle cx="12" cy="9" r="2.4" fill="#fff"/>
+              </svg>
+              Ubícanos
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta reveal" aria-label="Llamada a la acción">
+      <div class="final-cta-frame">
+        <div>
+          <h2>Estamos listos para acompañarte</h2>
+          <p>Descubre una experiencia cercana, clara y pensada para ti.</p>
+        </div>
+        <a class="btn btn-solid" href="#atencion">Comunícate ahora</a>
+      </div>
+    </section>
+
+    <section class="runtime-bar" aria-live="polite">
+      <p class="runtime-title">DevOps Kubernetes Demo</p>
+      <p class="runtime-note">Local CI/CD &amp; Kubernetes Demonstration</p>
+      <div class="runtime-grid">
+        <p><span>Aplicación</span> <strong id="application">—</strong></p>
+        <p><span>Versión</span> <strong id="version">—</strong></p>
+        <p><span>Ambiente</span> <strong id="environment">—</strong></p>
+        <p><span>Estado</span> <strong id="status">—</strong></p>
+        <p><span>Pod</span> <strong id="hostname">—</strong></p>
+        <p><span>Uptime</span> <strong id="uptime">—</strong></p>
+        <p><span>Node.js</span> <strong id="node-version">—</strong></p>
+        <p><span>Hora</span> <strong id="timestamp">—</strong></p>
+      </div>
+      <p class="version-badge" id="version-badge">v—</p>
+      <p class="status-pill" id="status-pill">
+        <span class="dot" id="status-dot" aria-hidden="true"></span>
+        <span id="status-label">Checking</span>
+      </p>
+      <p class="footer-note" id="refresh-note">Refreshing from /health and /info</p>
+    </section>
+
+    <footer class="site-footer">
+      <a class="brand" href="/" aria-label="Compartamos Banco">
+        <svg class="logo logo-sm" viewBox="0 0 168 46" role="img" aria-hidden="true">
+          <text x="0" y="20" class="logo-name">Compartamos</text>
+          <text x="118" y="40" class="logo-bank">Banco</text>
+          <g class="fish fish-a" transform="translate(112 1)">
+            <ellipse cx="10" cy="6" rx="9" ry="4" />
+            <polygon points="18,6 24,2 24,10" />
+          </g>
+          <g class="fish fish-b" transform="translate(62 26)">
+            <ellipse cx="8" cy="5" rx="7.5" ry="3.4" />
+            <polygon points="15,5 20,2 20,8" />
+          </g>
+          <g class="fish fish-c" transform="translate(86 28)">
+            <ellipse cx="7" cy="4.5" rx="6.5" ry="3" />
+            <polygon points="13,4.5 18,2 18,7" />
+          </g>
+        </svg>
+      </a>
+      <nav>
+        <a href="#blog">Blog</a>
+        <a href="#acerca">Acerca de</a>
+        <a href="#ayuda">Centro de ayuda</a>
+      </nav>
+    </footer>
+
     <script src="/app.js"></script>
+    <script>
+      const menus = [
+        { button: document.getElementById('open-creditos'), panel: document.getElementById('creditos-menu') },
+        { button: document.getElementById('open-cuentas'), panel: document.getElementById('cuentas-menu') },
+        { button: document.getElementById('open-seguros'), panel: document.getElementById('seguros-menu') },
+        { button: document.getElementById('open-canales'), panel: document.getElementById('canales-menu') },
+      ];
+      function closeMenus(except) {
+        menus.forEach(({ button, panel }) => {
+          if (panel === except) {
+            return;
+          }
+          panel.setAttribute('hidden', '');
+          button.setAttribute('aria-expanded', 'false');
+        });
+      }
+      menus.forEach(({ button, panel }) => {
+        button.addEventListener('click', () => {
+          const willOpen = panel.hasAttribute('hidden');
+          closeMenus(willOpen ? panel : null);
+          panel.toggleAttribute('hidden', !willOpen);
+          button.setAttribute('aria-expanded', String(willOpen));
+        });
+      });
+      document.addEventListener('click', (event) => {
+        if (menus.some(({ button, panel }) => button.contains(event.target) || panel.contains(event.target))) {
+          return;
+        }
+        closeMenus(null);
+      });
+
+      const track = document.getElementById('hero-track');
+      const slides = track.children;
+      const dots = [...document.querySelectorAll('.hero-dot')];
+      const slider = document.querySelector('.hero-slider');
+      let index = 0;
+      let timer = 0;
+
+      function showSlide(next) {
+        index = (next + slides.length) % slides.length;
+        track.style.transform = `translateX(-${index * 100}%)`;
+        dots.forEach((dot, position) => {
+          if (position === index) {
+            dot.setAttribute('aria-current', 'true');
+          } else {
+            dot.removeAttribute('aria-current');
+          }
+        });
+      }
+
+      function startSlides() {
+        window.clearInterval(timer);
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          return;
+        }
+        timer = window.setInterval(() => showSlide(index + 1), 6500);
+      }
+
+      document.querySelector('.hero-prev').addEventListener('click', () => {
+        showSlide(index - 1);
+        startSlides();
+      });
+      document.querySelector('.hero-next').addEventListener('click', () => {
+        showSlide(index + 1);
+        startSlides();
+      });
+      dots.forEach((dot, position) => {
+        dot.addEventListener('click', () => {
+          showSlide(position);
+          startSlides();
+        });
+      });
+      slider.addEventListener('mouseenter', () => window.clearInterval(timer));
+      slider.addEventListener('mouseleave', startSlides);
+      showSlide(0);
+      startSlides();
+
+      const revealItems = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.16 });
+        revealItems.forEach((item) => observer.observe(item));
+      } else {
+        revealItems.forEach((item) => item.classList.add('is-visible'));
+      }
+    </script>
   </body>
 </html>
