@@ -36,4 +36,6 @@ jobs:
           kubectl config use-context docker-desktop
           kubectl apply -f k8s
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          kubectl rollout restart deployment/devops-demo
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           kubectl rollout status deployment/devops-demo --timeout=180s

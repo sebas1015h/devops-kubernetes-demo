@@ -23,3 +23,4 @@ jobs:
       - uses: github/codeql-action/analyze@v4
         with:
           upload: true
+          category: "/language:javascript-typescript"

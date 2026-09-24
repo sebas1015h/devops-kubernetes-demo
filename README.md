@@ -8,26 +8,26 @@ Esta aplicación Node.js es estable, sin estado y puede ejecutarse en Docker o e
 
 ## Qué incluye
 
-| Área | Contenido |
-| --- | --- |
-| Aplicación | Node.js + Express en `src/` |
-| Pruebas | `test/` con `node:test` + `supertest` |
-| Contenedor | Dockerfile multi-stage, usuario no-root, `HEALTHCHECK` |
-| CI | `.github/workflows/ci.yml` — build, lint y test en PR |
-| Imagen | `.github/workflows/docker-publish.yml` — build, Trivy y push a GHCR |
-| Seguridad | `.github/workflows/codeql.yml` — CodeQL (GitHub Advanced Security) |
-| Deploy | `.github/workflows/deploy.yml` — entorno `production` con aprobación |
-| Dependabot | `.github/dependabot.yml` — npm, Actions y Docker |
-| Kubernetes | Deployment, Service, HPA e Ingress |
+| Área | Componente | Archivo |
+| --- | --- | --- |
+| Aplicación | API REST Node.js + Express | `src/` |
+| Pruebas | Tests automatizados (node:test + supertest) | `test/` |
+| Contenedor | Imagen multi-stage, usuario no-root, healthcheck | `Dockerfile` |
+| CI | Build + Lint + Test en cada PR | `.github/workflows/ci.yml` |
+| Empaquetado | Build y push de imagen a GHCR | `.github/workflows/docker-publish.yml` |
+| Seguridad (SAST) | CodeQL — GitHub Advanced Security | `.github/workflows/codeql.yml` |
+| Despliegue | Deploy a Kubernetes con environment/aprobación | `.github/workflows/deploy.yml` |
+| Cadena de suministro | Dependabot (npm, actions, docker) | `.github/dependabot.yml` |
+| Kubernetes | Deployment, Service, Ingress | `k8s/` |
 
 ## La API
 
 | Método | Ruta | Descripción |
 | --- | --- | --- |
-| `GET` | `/` | Info del servicio (`Accept: application/json`) o dashboard HTML |
-| `GET` | `/health` | Health check |
-| `GET` | `/api/products` | Catálogo de productos |
-| `GET` | `/api/products/:id` | Detalle de producto |
+| `GET` | `/` | Info del servicio |
+| `GET` | `/health` | Liveness/readiness |
+| `GET` | `/api/products` | Lista de productos |
+| `GET` | `/api/products/:id` | Producto por id |
 
 También expone `/version`, `/info` y `/cpu` para la demo de ciclo de vida.
 
