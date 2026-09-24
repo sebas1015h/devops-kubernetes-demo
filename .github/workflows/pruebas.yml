@@ -23,3 +23,20 @@ jobs:
           format: table
           exit-code: "1"
           severity: HIGH,CRITICAL
+
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, Windows, X64]
+    steps:
+      - uses: actions/checkout@v4
+      - shell: powershell
+        run: docker build -t devops-kubernetes-demo:1.0.0 .
+      - shell: powershell
+        run: .\scripts\import-image.ps1
+      - shell: powershell
+        run: |
+          kubectl config use-context docker-desktop
+          kubectl apply -f k8s
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          kubectl rollout status deployment/devops-demo --timeout=180s
