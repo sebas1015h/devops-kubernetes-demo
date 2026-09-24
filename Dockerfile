@@ -8,7 +8,6 @@ RUN npm ci --omit=dev && npm cache clean --force
 COPY src ./src
 COPY public ./public
 
-# La aplicación solo ejecuta Node. npm no hace falta en la imagen final.
 RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 
 ENV APP_NAME="DevOps Kubernetes Demo" \

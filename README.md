@@ -4,7 +4,7 @@ Aplicación web local para una demostración técnica del recorrido:
 
 `Código → Git → GitHub → GitHub Actions → Docker → Trivy → Kubernetes → Rolling Update → Logs → Métricas → HPA`
 
-Esta aplicación Node.js es estable, sin estado y puede ejecutarse en Docker o en Kubernetes. Todavía no incluye pipelines ni pruebas de carga.
+Esta aplicación Node.js es estable, sin estado y puede ejecutarse en Docker o en Kubernetes.
 
 ## Arquitectura
 
