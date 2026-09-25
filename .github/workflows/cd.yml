@@ -1,12 +1,10 @@
 name: CD
 
 on:
-  workflow_call:
-    inputs:
-      sha:
-        description: Commit SHA used as the container image tag
-        required: true
-        type: string
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
 
 permissions:
   contents: read
@@ -15,12 +13,20 @@ permissions:
 jobs:
   deploy:
     name: Deploy Kubernetes
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
     runs-on: [self-hosted, Windows, X64]
     environment:
       name: production
       url: http://127.0.0.1:3000
+    env:
+      IMAGE_SHA: ${{ github.event.workflow_run.head_sha }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -29,7 +35,7 @@ jobs:
       - name: Pull image from GHCR
         shell: powershell
         run: |
-          docker pull "ghcr.io/${{ github.repository }}:${{ inputs.sha }}"
+          docker pull "ghcr.io/${{ github.repository }}:$env:IMAGE_SHA"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Import image into Kubernetes cluster
         shell: powershell
@@ -39,8 +45,8 @@ jobs:
           $line = @($raw | Where-Object { $_ -match '/usr/local/bin/containerd$' }) | Select-Object -First 1
           if (-not $line) { throw "No se encontro el runtime del cluster" }
           $ctrPid = ($line.Trim() -split '\s+')[0]
-          $image = "ghcr.io/${{ github.repository }}:${{ inputs.sha }}"
-          $tar = Join-Path $env:TEMP "devops-kubernetes-demo-${{ inputs.sha }}.tar"
+          $image = "ghcr.io/${{ github.repository }}:$env:IMAGE_SHA"
+          $tar = Join-Path $env:TEMP "devops-kubernetes-demo-$env:IMAGE_SHA.tar"
           docker save $image -o $tar
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cmd /c "wsl -d docker-desktop -- sh -c `"nsenter -t $ctrPid -m ctr -n k8s.io images import -`" < `"$tar`""
@@ -51,6 +57,6 @@ jobs:
           kubectl config use-context docker-desktop
           kubectl apply -f k8s
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          kubectl set image deployment/devops-demo devops-demo="ghcr.io/${{ github.repository }}:${{ inputs.sha }}"
+          kubectl set image deployment/devops-demo devops-demo="ghcr.io/${{ github.repository }}:$env:IMAGE_SHA"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           kubectl rollout status deployment/devops-demo --timeout=180s

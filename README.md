@@ -13,12 +13,12 @@ Esta aplicación Node.js es estable, sin estado y puede ejecutarse en Docker o e
 | Aplicación | API REST Node.js + Express | `src/` |
 | Pruebas | Tests automatizados (node:test + supertest) | `test/` |
 | Contenedor | Imagen multi-stage, usuario no-root, healthcheck | `Dockerfile` |
-| CI | Build + Lint + Test en cada PR | `.github/workflows/ci.yml` |
-| Empaquetado | Build y push de imagen a GHCR | `.github/workflows/docker-publish.yml` |
-| Seguridad (SAST) | CodeQL — GitHub Advanced Security | `.github/workflows/codeql.yml` |
-| Despliegue | Deploy a Kubernetes con environment/aprobación | `.github/workflows/deploy.yml` |
+| CI | Lint, test, CodeQL, Trivy y build/push a GHCR | `.github/workflows/ci.yml` |
+| CD | Deploy a Kubernetes (se dispara cuando CI termina OK en `main`) | `.github/workflows/cd.yml` |
 | Cadena de suministro | Dependabot (npm, actions, docker) | `.github/dependabot.yml` |
 | Kubernetes | Deployment, Service, Ingress | `k8s/` |
+
+En Actions verás dos workflows: **CI** y **CD**, cada uno con su historial de runs. En pull requests solo corre CI (sin publish). En push a `main`, CI publica la imagen y, al terminar con éxito, CD despliega usando el SHA del commit como tag.
 
 ## La API
 
@@ -121,7 +121,7 @@ Detén el contenedor con Ctrl+C. Docker envía `SIGTERM` y la aplicación se cie
 
 Docker Desktop trae un clúster local. Actívalo en **Settings → Kubernetes → Enable Kubernetes** y espera a que quede en ejecución.
 
-El Deployment usa la imagen publicada en GitHub: `ghcr.io/sebas1015h/devops-kubernetes-demo:1.0.0`. `imagePullPolicy` es `IfNotPresent`. El runner descarga esa imagen desde GHCR y la importa al clúster. Si el nodo ya la tiene, no la vuelve a descargar.
+El Deployment declara una imagen base en `k8s/deployment.yaml`. En el pipeline, el job CD publica y aplica el tag del commit (`ghcr.io/sebas1015h/devops-kubernetes-demo:<sha>`). `imagePullPolicy` es `IfNotPresent`. El runner self-hosted descarga la imagen desde GHCR y la importa al clúster local. Si el nodo ya la tiene, no la vuelve a descargar.
 
 Detén el contenedor suelto si todavía usa el puerto 3000 y despliega:
 
