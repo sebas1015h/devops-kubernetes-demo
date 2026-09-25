@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=52" />
+    <link rel="stylesheet" href="/styles.css?v=53" />
   </head>
   <body>
     <div class="site-nav">
@@ -202,7 +202,7 @@
         <button class="hero-arrow hero-prev" type="button" aria-label="Anterior">‹</button>
         <button class="hero-arrow hero-next" type="button" aria-label="Siguiente">›</button>
         <div class="hero-dots" role="tablist" aria-label="Diapositivas">
-          <button class="hero-dot" type="button" aria-label="Ciclo digital"></button>
+          <button class="hero-dot" type="button" aria-label="Banca digital"></button>
           <button class="hero-dot" type="button" aria-label="Productos"></button>
         </div>
       </div>
@@ -322,7 +322,7 @@
 
     <section class="runtime-bar" aria-live="polite">
       <p class="runtime-title">DevOps Kubernetes Demo</p>
-      <p class="runtime-note">Local CI/CD &amp; Kubernetes Demonstration</p>
+      <p class="runtime-note">Demostración local de CI/CD y Kubernetes</p>
       <div class="runtime-grid">
         <p><span>Aplicación</span> <strong id="application">—</strong></p>
         <p><span>Versión</span> <strong id="version">—</strong></p>
@@ -336,9 +336,9 @@
       <p class="version-badge" id="version-badge">v—</p>
       <p class="status-pill" id="status-pill">
         <span class="dot" id="status-dot" aria-hidden="true"></span>
-        <span id="status-label">Checking</span>
+        <span id="status-label">Comprobando</span>
       </p>
-      <p class="footer-note" id="refresh-note">Refreshing from /health and /info</p>
+      <p class="footer-note" id="refresh-note">Actualizando desde /health e /info</p>
     </section>
 
     <footer class="site-footer">
@@ -368,97 +368,5 @@
     </footer>
 
     <script src="/app.js"></script>
-    <script>
-      const menus = [
-        { button: document.getElementById('open-creditos'), panel: document.getElementById('creditos-menu') },
-        { button: document.getElementById('open-cuentas'), panel: document.getElementById('cuentas-menu') },
-        { button: document.getElementById('open-seguros'), panel: document.getElementById('seguros-menu') },
-        { button: document.getElementById('open-canales'), panel: document.getElementById('canales-menu') },
-      ];
-      function closeMenus(except) {
-        menus.forEach(({ button, panel }) => {
-          if (panel === except) {
-            return;
-          }
-          panel.setAttribute('hidden', '');
-          button.setAttribute('aria-expanded', 'false');
-        });
-      }
-      menus.forEach(({ button, panel }) => {
-        button.addEventListener('click', () => {
-          const willOpen = panel.hasAttribute('hidden');
-          closeMenus(willOpen ? panel : null);
-          panel.toggleAttribute('hidden', !willOpen);
-          button.setAttribute('aria-expanded', String(willOpen));
-        });
-      });
-      document.addEventListener('click', (event) => {
-        if (menus.some(({ button, panel }) => button.contains(event.target) || panel.contains(event.target))) {
-          return;
-        }
-        closeMenus(null);
-      });
-
-      const track = document.getElementById('hero-track');
-      const slides = track.children;
-      const dots = [...document.querySelectorAll('.hero-dot')];
-      const slider = document.querySelector('.hero-slider');
-      let index = 0;
-      let timer = 0;
-
-      function showSlide(next) {
-        index = (next + slides.length) % slides.length;
-        track.style.transform = `translateX(-${index * 100}%)`;
-        dots.forEach((dot, position) => {
-          if (position === index) {
-            dot.setAttribute('aria-current', 'true');
-          } else {
-            dot.removeAttribute('aria-current');
-          }
-        });
-      }
-
-      function startSlides() {
-        window.clearInterval(timer);
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          return;
-        }
-        timer = window.setInterval(() => showSlide(index + 1), 6500);
-      }
-
-      document.querySelector('.hero-prev').addEventListener('click', () => {
-        showSlide(index - 1);
-        startSlides();
-      });
-      document.querySelector('.hero-next').addEventListener('click', () => {
-        showSlide(index + 1);
-        startSlides();
-      });
-      dots.forEach((dot, position) => {
-        dot.addEventListener('click', () => {
-          showSlide(position);
-          startSlides();
-        });
-      });
-      slider.addEventListener('mouseenter', () => window.clearInterval(timer));
-      slider.addEventListener('mouseleave', startSlides);
-      showSlide(0);
-      startSlides();
-
-      const revealItems = document.querySelectorAll('.reveal');
-      if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('is-visible');
-              observer.unobserve(entry.target);
-            }
-          });
-        }, { threshold: 0.16 });
-        revealItems.forEach((item) => observer.observe(item));
-      } else {
-        revealItems.forEach((item) => item.classList.add('is-visible'));
-      }
-    </script>
   </body>
 </html>

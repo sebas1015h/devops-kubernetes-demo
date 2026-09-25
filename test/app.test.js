@@ -58,7 +58,8 @@ describe('devops kubernetes demo', { concurrency: 1 }, () => {
     assert.equal(response.status, 200);
     assert.match(response.headers['content-type'], /text\/html/);
     assert.match(response.text, /DevOps Kubernetes Demo/);
-    assert.match(response.text, /Local CI\/CD &amp; Kubernetes Demonstration/);
+    assert.match(response.text, /Demostración local de CI\/CD y Kubernetes/);
+    assert.match(response.text, /Compartamos Banco/);
   });
 
   it('GET / with Accept application/json returns service info', async () => {

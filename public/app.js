@@ -24,7 +24,7 @@ function formatVersion(version) {
 
 function formatUptime(seconds) {
   const value = Number.isFinite(seconds) ? seconds : 0;
-  return `${value} seconds`;
+  return `${value} s`;
 }
 
 function formatTimestamp(isoTimestamp) {
@@ -41,8 +41,8 @@ function formatTimestamp(isoTimestamp) {
 function setStatus(isHealthy) {
   fields.statusPill.classList.remove('healthy', 'unhealthy');
   fields.statusPill.classList.add(isHealthy ? 'healthy' : 'unhealthy');
-  fields.statusLabel.textContent = isHealthy ? 'Healthy' : 'Unhealthy';
-  fields.status.textContent = isHealthy ? 'Healthy' : 'Unhealthy';
+  fields.statusLabel.textContent = isHealthy ? 'Operativo' : 'Sin respuesta';
+  fields.status.textContent = isHealthy ? 'Operativo' : 'Sin respuesta';
 }
 
 async function readJson(response) {
@@ -73,12 +73,106 @@ async function refresh() {
     fields.nodeVersion.textContent = info.nodeVersion || '—';
     fields.timestamp.textContent = formatTimestamp(health.timestamp);
     setStatus(isHealthy);
-    fields.refreshNote.textContent = 'Live data from /health and /info';
+    fields.refreshNote.textContent = 'Datos en vivo de /health e /info';
   } catch (error) {
     setStatus(false);
-    fields.refreshNote.textContent = 'Unable to refresh application status';
+    fields.refreshNote.textContent = 'No se pudo actualizar el estado';
   }
 }
 
 refresh();
 setInterval(refresh, REFRESH_MS);
+
+const menus = [
+  { button: document.getElementById('open-creditos'), panel: document.getElementById('creditos-menu') },
+  { button: document.getElementById('open-cuentas'), panel: document.getElementById('cuentas-menu') },
+  { button: document.getElementById('open-seguros'), panel: document.getElementById('seguros-menu') },
+  { button: document.getElementById('open-canales'), panel: document.getElementById('canales-menu') },
+];
+
+function closeMenus(except) {
+  menus.forEach(({ button, panel }) => {
+    if (panel === except) {
+      return;
+    }
+    panel.setAttribute('hidden', '');
+    button.setAttribute('aria-expanded', 'false');
+  });
+}
+
+menus.forEach(({ button, panel }) => {
+  button.addEventListener('click', () => {
+    const willOpen = panel.hasAttribute('hidden');
+    closeMenus(willOpen ? panel : null);
+    panel.toggleAttribute('hidden', !willOpen);
+    button.setAttribute('aria-expanded', String(willOpen));
+  });
+});
+
+document.addEventListener('click', (event) => {
+  if (menus.some(({ button, panel }) => button.contains(event.target) || panel.contains(event.target))) {
+    return;
+  }
+  closeMenus(null);
+});
+
+const track = document.getElementById('hero-track');
+const slides = track.children;
+const dots = [...document.querySelectorAll('.hero-dot')];
+const slider = document.querySelector('.hero-slider');
+let index = 0;
+let timer = 0;
+
+function showSlide(next) {
+  index = (next + slides.length) % slides.length;
+  track.style.transform = `translateX(-${index * 100}%)`;
+  dots.forEach((dot, position) => {
+    if (position === index) {
+      dot.setAttribute('aria-current', 'true');
+    } else {
+      dot.removeAttribute('aria-current');
+    }
+  });
+}
+
+function startSlides() {
+  window.clearInterval(timer);
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return;
+  }
+  timer = window.setInterval(() => showSlide(index + 1), 6500);
+}
+
+document.querySelector('.hero-prev').addEventListener('click', () => {
+  showSlide(index - 1);
+  startSlides();
+});
+document.querySelector('.hero-next').addEventListener('click', () => {
+  showSlide(index + 1);
+  startSlides();
+});
+dots.forEach((dot, position) => {
+  dot.addEventListener('click', () => {
+    showSlide(position);
+    startSlides();
+  });
+});
+slider.addEventListener('mouseenter', () => window.clearInterval(timer));
+slider.addEventListener('mouseleave', startSlides);
+showSlide(0);
+startSlides();
+
+const revealItems = document.querySelectorAll('.reveal');
+if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.16 });
+  revealItems.forEach((item) => observer.observe(item));
+} else {
+  revealItems.forEach((item) => item.classList.add('is-visible'));
+}
