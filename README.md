@@ -14,11 +14,9 @@ API Node.js sin estado, lista para Docker y Kubernetes.
 | Pruebas | node:test + supertest | `test/` |
 | Contenedor | Multi-stage, usuario no-root, healthcheck | `Dockerfile` |
 | CI | Lint, test, CodeQL, Trivy y push a GHCR | `.github/workflows/ci.yml` |
-| CD | Deploy a Kubernetes tras CI OK en `main` | `.github/workflows/cd.yml` |
+| CD | Deploy a Kubernetes | `.github/workflows/cd.yml` |
 | Cadena de suministro | Dependabot (npm, actions, docker) | `.github/dependabot.yml` |
 | Kubernetes | Deployment, Service, Ingress | `k8s/` |
-
-En Actions hay dos workflows: **CI** y **CD**. En pull requests solo corre CI. En push a `main`, CI publica la imagen y CD despliega con el SHA del commit.
 
 ## API
 
