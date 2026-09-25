@@ -1,322 +1,92 @@
 # DevOps Kubernetes Demo
 
-Aplicación web local para una demostración técnica del recorrido:
+Demostración técnica del recorrido:
 
 `Código → Git → GitHub → GitHub Actions → CodeQL → Docker → Trivy → Kubernetes → Rolling Update → Logs`
 
-Esta aplicación Node.js es estable, sin estado y puede ejecutarse en Docker o en Kubernetes.
+API Node.js sin estado, lista para Docker y Kubernetes.
 
 ## Qué incluye
 
 | Área | Componente | Archivo |
 | --- | --- | --- |
 | Aplicación | API REST Node.js + Express | `src/` |
-| Pruebas | Tests automatizados (node:test + supertest) | `test/` |
-| Contenedor | Imagen multi-stage, usuario no-root, healthcheck | `Dockerfile` |
-| CI | Lint, test, CodeQL, Trivy y build/push a GHCR | `.github/workflows/ci.yml` |
-| CD | Deploy a Kubernetes (se dispara cuando CI termina OK en `main`) | `.github/workflows/cd.yml` |
+| Pruebas | node:test + supertest | `test/` |
+| Contenedor | Multi-stage, usuario no-root, healthcheck | `Dockerfile` |
+| CI | Lint, test, CodeQL, Trivy y push a GHCR | `.github/workflows/ci.yml` |
+| CD | Deploy a Kubernetes tras CI OK en `main` | `.github/workflows/cd.yml` |
+| Cadena de suministro | Dependabot (npm, actions, docker) | `.github/dependabot.yml` |
 | Kubernetes | Deployment, Service, Ingress | `k8s/` |
 
-En Actions verás dos workflows: **CI** y **CD**, cada uno con su historial de runs. En pull requests solo corre CI (sin publish). En push a `main`, CI publica la imagen y, al terminar con éxito, CD despliega usando el SHA del commit como tag.
+En Actions hay dos workflows: **CI** y **CD**. En pull requests solo corre CI. En push a `main`, CI publica la imagen y CD despliega con el SHA del commit.
 
-## La API
+## API
 
 | Método | Ruta | Descripción |
 | --- | --- | --- |
-| `GET` | `/` | Info del servicio |
-| `GET` | `/health` | Liveness/readiness |
+| `GET` | `/` | Info del servicio (JSON) o dashboard HTML |
+| `GET` | `/health` | Liveness / readiness |
+| `GET` | `/version` | Versión (`APP_VERSION`) |
+| `GET` | `/info` | Datos de runtime y hostname |
+| `GET` | `/cpu` | Carga de CPU controlada (demo) |
 | `GET` | `/api/products` | Lista de productos |
 | `GET` | `/api/products/:id` | Producto por id |
 
-También expone `/version`, `/info` y `/cpu` para la demo de ciclo de vida.
+La interfaz consulta `/health` e `/info` cada 3 segundos.
 
-## Arquitectura
+## Requisitos
 
-```text
-Browser
-   |
-   v
-Express Application
-   |
-   +-- /
-   +-- /health
-   +-- /version
-   +-- /info
-   +-- /cpu
-   +-- /api/products
-   +-- /api/products/:id
-```
+- Node.js 18+
+- npm
+- Docker Desktop (con Kubernetes activado para el deploy)
 
-La interfaz consume `/health` y `/info` cada 3 segundos, sin recargar la página. La versión visible sale únicamente de `APP_VERSION`.
-
-## Prerrequisitos
-
-```text
-Node.js 18 o superior
-npm
-Docker Desktop
-```
-
-## Instalación
+## Uso local
 
 ```bash
 npm install
-```
-
-La aplicación funciona sin archivo `.env`. Las variables (`APP_NAME`, `APP_VERSION`, `APP_ENVIRONMENT`, `PORT`) se toman del entorno del proceso, del contenedor o del Deployment de Kubernetes. Si no se definen, usa valores por defecto.
-
-## Ejecutar
-
-```bash
 npm start
 ```
 
-La aplicación escucha en `0.0.0.0:3000`.
-
 Abre [http://localhost:3000](http://localhost:3000).
-
-## Ejecutar en desarrollo
-
-```bash
-npm run dev
-```
-
-Reinicia el proceso cuando cambian los archivos de `src/`.
-
-## Lint y pruebas
 
 ```bash
 npm run lint
 npm test
 ```
 
-Las pruebas usan `node:test` con `supertest`. Terminan con código `0` cuando todo es correcto.
+Variables opcionales: `APP_NAME`, `APP_VERSION`, `APP_ENVIRONMENT`, `PORT`. Sin `.env`; se leen del proceso, del contenedor o del Deployment.
 
-## Ejecutar con Docker
-
-Construye la imagen:
+## Docker
 
 ```bash
 docker build -t devops-kubernetes-demo:1.0.0 .
-```
-
-Inicia el contenedor:
-
-```bash
 docker run --rm -p 3000:3000 --name devops-demo devops-kubernetes-demo:1.0.0
 ```
 
-Abre [http://localhost:3000](http://localhost:3000). Dentro del contenedor el ambiente es `docker` y la versión sigue saliendo de `APP_VERSION`.
-
-Para ver la versión 2 sin reconstruir la imagen:
+Para mostrar otra versión sin reconstruir:
 
 ```bash
 docker run --rm -p 3000:3000 -e APP_VERSION=2.0.0 --name devops-demo devops-kubernetes-demo:1.0.0
 ```
 
-Detén el contenedor con Ctrl+C. Docker envía `SIGTERM` y la aplicación se cierra de forma ordenada.
-
 ## Kubernetes
 
-Docker Desktop trae un clúster local. Actívalo en **Settings → Kubernetes → Enable Kubernetes** y espera a que quede en ejecución.
-
-El Deployment declara una imagen base en `k8s/deployment.yaml`. En el pipeline, el job CD publica y aplica el tag del commit (`ghcr.io/sebas1015h/devops-kubernetes-demo:<sha>`). `imagePullPolicy` es `IfNotPresent`. El runner self-hosted descarga la imagen desde GHCR y la importa al clúster local. Si el nodo ya la tiene, no la vuelve a descargar.
-
-Detén el contenedor suelto si todavía usa el puerto 3000 y despliega:
+Activa Kubernetes en Docker Desktop. El CD importa desde GHCR la imagen con tag del commit y aplica `k8s/`.
 
 ```bash
 kubectl apply -f k8s/
 kubectl get pods
 kubectl get service devops-demo
-kubectl get ingress devops-demo
-```
-
-Abre [http://localhost:3000](http://localhost:3000). El ambiente pasa a `kubernetes` y el hostname es el nombre del Pod. Hay dos réplicas, así que al refrescar puede responder uno u otro.
-
-`/health` es la prueba de vida y de disponibilidad. Para ver los logs de un Pod:
-
-```bash
 kubectl logs -l app=devops-demo --tail=20
 ```
 
-La versión sigue saliendo de `APP_VERSION`, dentro de `k8s/deployment.yaml`.
-
-## Endpoints
-
-### `GET /`
-
-Con `Accept: application/json` responde info del servicio:
-
-```json
-{
-  "service": "DevOps Kubernetes Demo",
-  "version": "1.0.0",
-  "environment": "local",
-  "endpoints": ["/health", "/version", "/info", "/cpu", "/api/products", "/api/products/:id"]
-}
-```
-
-Sin ese header (navegador), sirve el dashboard HTML.
-
-### `GET /health`
-
-Comprobación ligera para probes y pipelines.
-
-```json
-{
-  "status": "healthy",
-  "application": "DevOps Kubernetes Demo",
-  "version": "1.0.0",
-  "timestamp": "2026-09-23T15:30:00.000Z"
-}
-```
-
-Responde `200`.
-
-### `GET /api/products`
-
-```json
-{
-  "products": [
-    {
-      "id": "creditos",
-      "name": "Créditos",
-      "description": "Financiamiento cercano para impulsar el crecimiento de personas y negocios."
-    }
-  ]
-}
-```
-
-### `GET /api/products/:id`
-
-Detalle de un producto. Si no existe, responde `404`.
-
-### `GET /version`
-
-```json
-{
-  "application": "DevOps Kubernetes Demo",
-  "version": "1.0.0",
-  "environment": "local"
-}
-```
-
-`version` proviene de `APP_VERSION`.
-
-### `GET /info`
-
-```json
-{
-  "application": "DevOps Kubernetes Demo",
-  "version": "1.0.0",
-  "environment": "local",
-  "hostname": "demo-app",
-  "nodeVersion": "v22.0.0",
-  "platform": "linux",
-  "uptime": 120
-}
-```
-
-`hostname` usa `os.hostname()`, así se puede identificar el Pod que responde.
-
-### `GET /cpu`
-
-Genera carga de CPU durante un intervalo corto y finito. Sin parámetro dura `300` ms. Con `duration` acepta un entero positivo y nunca trabaja más de `2000` ms.
-
-```json
-{
-  "message": "CPU load generated",
-  "duration": 500,
-  "hostname": "demo-app"
-}
-```
-
-Un valor no numérico responde `400`.
-
-### Errores
-
-Ruta inexistente, `404`:
-
-```json
-{
-  "error": "Route not found"
-}
-```
-
-Error interno, `500`:
-
-```json
-{
-  "error": "Internal Server Error"
-}
-```
-
-La respuesta no incluye el stack trace.
+Abre [http://localhost:3000](http://localhost:3000). Hay dos réplicas; el hostname identifica el Pod.
 
 ## Variables de entorno
 
 | Variable | Predeterminado | Uso |
 | --- | --- | --- |
-| `APP_NAME` | `DevOps Kubernetes Demo` | Nombre mostrado por la API y el dashboard |
-| `APP_VERSION` | `1.0.0` | Versión de la aplicación. Cámbiala a `2.0.0` para la demo de rolling update |
-| `APP_ENVIRONMENT` | `local` | Ambiente mostrado en `/version`, `/info` y el dashboard |
+| `APP_NAME` | `DevOps Kubernetes Demo` | Nombre en API y dashboard |
+| `APP_VERSION` | `1.0.0` | Versión visible (rolling update) |
+| `APP_ENVIRONMENT` | `local` | Ambiente mostrado |
 | `PORT` | `3000` | Puerto HTTP |
-
-Ejemplo para mostrar la versión 2 sin modificar código:
-
-```bash
-APP_VERSION=2.0.0 npm start
-```
-
-En PowerShell:
-
-```powershell
-$env:APP_VERSION="2.0.0"; npm start
-```
-
-## Pruebas rápidas
-
-```bash
-curl http://localhost:3000/health
-```
-
-```bash
-curl -H "Accept: application/json" http://localhost:3000/
-```
-
-```bash
-curl http://localhost:3000/api/products
-```
-
-```bash
-curl http://localhost:3000/version
-```
-
-```bash
-curl http://localhost:3000/info
-```
-
-```bash
-curl "http://localhost:3000/cpu?duration=500"
-```
-
-## Logs y cierre
-
-Cada request escribe una línea:
-
-```text
-[2026-09-23T15:30:00Z] GET /health 200 hostname=demo-app
-```
-
-`SIGTERM` y `SIGINT` detienen la aceptación de conexiones nuevas y cierran el servidor HTTP antes de salir. Ese comportamiento es el que usará después un rolling update de Kubernetes.
-
-## Preparación para Docker y Kubernetes
-
-- Escucha en `0.0.0.0`.
-- El puerto sale de `PORT`.
-- No depende de `localhost` dentro de la aplicación.
-- `/health` está listo para `livenessProbe` y `readinessProbe`.
-- La aplicación no guarda estado ni archivos locales.
-- El hostname identifica el proceso o Pod que responde.
-- `/cpu` permite generar carga de CPU de forma controlada.
-- El cierre controlado responde a `SIGTERM`.
