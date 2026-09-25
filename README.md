@@ -15,7 +15,6 @@ Esta aplicación Node.js es estable, sin estado y puede ejecutarse en Docker o e
 | Contenedor | Imagen multi-stage, usuario no-root, healthcheck | `Dockerfile` |
 | CI | Lint, test, CodeQL, Trivy y build/push a GHCR | `.github/workflows/ci.yml` |
 | CD | Deploy a Kubernetes (se dispara cuando CI termina OK en `main`) | `.github/workflows/cd.yml` |
-| Cadena de suministro | Dependabot (npm, actions, docker) | `.github/dependabot.yml` |
 | Kubernetes | Deployment, Service, Ingress | `k8s/` |
 
 En Actions verás dos workflows: **CI** y **CD**, cada uno con su historial de runs. En pull requests solo corre CI (sin publish). En push a `main`, CI publica la imagen y, al terminar con éxito, CD despliega usando el SHA del commit como tag.
