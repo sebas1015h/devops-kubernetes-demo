@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   push:
@@ -7,6 +7,9 @@ on:
 
 permissions:
   contents: read
+  actions: read
+  security-events: write
+  packages: write
 
 jobs:
   build:
@@ -22,3 +25,86 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: docker build -t devops-kubernetes-demo:1.0.0 .
+
+  codeql:
+    name: Analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          build-mode: none
+      - uses: github/codeql-action/analyze@v4
+        with:
+          upload: true
+          category: "/language:javascript-typescript"
+
+  trivy-config:
+    name: Trivy Config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trivy scan Dockerfile
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          scan-ref: Dockerfile
+          format: sarif
+          output: trivy-dockerfile.sarif
+          exit-code: "0"
+      - name: Trivy scan k8s
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          scan-ref: k8s
+          format: sarif
+          output: trivy-k8s.sarif
+          exit-code: "0"
+      - name: Upload Trivy Dockerfile SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-dockerfile.sarif
+          category: trivy-dockerfile
+      - name: Upload Trivy k8s SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-k8s.sarif
+          category: trivy-k8s
+
+  publish:
+    name: Build Push GHCR
+    needs: [build, codeql]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t "ghcr.io/${{ github.repository }}:${{ github.sha }}" .
+      - name: Trivy scan image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: "ghcr.io/${{ github.repository }}:${{ github.sha }}"
+          format: sarif
+          output: trivy-image.sarif
+          exit-code: "0"
+          severity: HIGH,CRITICAL
+      - name: Upload Trivy image SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-image.sarif
+          category: trivy-image
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - run: docker push "ghcr.io/${{ github.repository }}:${{ github.sha }}"
+
+  deploy:
+    name: Deploy
+    needs: [publish]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/cd.yml
+    with:
+      sha: ${{ github.sha }}
+    secrets: inherit
